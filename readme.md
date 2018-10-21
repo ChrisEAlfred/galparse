@@ -49,7 +49,7 @@ cupl -j <.pld source file>
 Conversion for G540 programmer (can be done in Windows 10):
 
 ~~~
-python.exe g540jedec.py ..\CG3\SYNCGAL\SYNCGAL5.JED ..\CG3\SYNCGAL\SYNCGAL5_g540.JED
+python.exe g540jedec.py test.JED test_g540.JED
 ~~~
 
 ---
@@ -69,24 +69,5 @@ Arguments:
 Example:
 
 ~~~
-python.exe .\gal22v10parse.py ..\CG3\SYNCGAL5_g540.JED "v5 h3 h2 h1 h0 h4 h5 hblank v6 v2 v3 v4 lin
-c lastl lrst v9 v8 l512 hsync vsync blank vscrst"
-~~~
-
----
-
-# CG3
-
-IOGAL2
-
-~~~
-python.exe .\gal22v10parse.py '..\CG3\IOGAL2\iogal2_readback.jed' "CA DBCAS L512 LA1 LA3 LA0 VRAMn
- IOSELn LA4 LA2 LP1SELn LADD1 CPUADD DBEN RAMEN S2 S1 S0 XDN XUP YDN YUP"
-~~~
-
-OUTPUT4
-
-~~~
-python.exe .\gal22v10parse.py '..\CG3\OUTPUT\output4_readback.jed' "DOTCLK AT14 PD0 PD1 PD2
- PD3 PD4 PD5 PD6 PD7 WSTRB UNK SEL0 SEL1 SBLU PBLU SGRN PGRN PRED SRED HS VS"
+python.exe .\gal22v10parse.py test_g540.JED "p1 p2 p3 p4 p5 p6 p7 p8 p9 p10 p11 p13 p14 p15 p16 p17 p18 p19 p20 p21 p22 p23"
 ~~~
