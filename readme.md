@@ -30,7 +30,7 @@ Arguments:
 
 ---
 
-## CUPL Compilser
+## CUPL Compiler
 
 *ONLY WORKS IN XP*
 
@@ -87,6 +87,6 @@ python.exe .\gal22v10parse.py '..\CG3\IOGAL2\iogal2_readback.jed' "CA DBCAS L512
 OUTPUT4
 
 ~~~
-python.exe .\gal22v10parse.py '..\CG3\OUTPUT\output4_readback - Copy.jed' "DOTCLK AT14 PD0 PD1 PD2
+python.exe .\gal22v10parse.py '..\CG3\OUTPUT\output4_readback.jed' "DOTCLK AT14 PD0 PD1 PD2
  PD3 PD4 PD5 PD6 PD7 WSTRBn UNK SEL0 SEL1 SBLU PBLU SGRN PGRN PRED SRED HS VS"
 ~~~
