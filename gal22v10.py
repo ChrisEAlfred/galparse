@@ -167,7 +167,13 @@ class Gal22v10:
                     if x == '0': # '0' is NOT fused
                         if index != 0 and terms != 0:
                             s = s + ' & '
-                        s = s + self.fuserow[index]
+                        term_name = self.fuserow[index]
+
+                        # Remove double NOTs
+                        if term_name.startswith('!!'):
+                            term_name = term_name[2:]
+
+                        s = s + term_name
                         terms = terms + 1
 
                     prev_term = x
@@ -177,12 +183,17 @@ class Gal22v10:
                 if terms == 0:
                     s = '1'
 
+                # Determine output target name
+                output_name = mc.name
+                if output_name.startswith('!!'):
+                    output_name = output_name[2:]
+
                 if or_term == 0:
                     # The first line must be printed
-                    s = mc.name + ' = ' + s
+                    s = output_name + ' = ' + s
                     print(s)
                 elif terms != 0 and s != '0':
-                    s = ' ' * len(mc.name) + ' # ' + s
+                    s = ' ' * len(output_name) + ' # ' + s
                     print(s)
 
                 fuse_index = fuse_index + number_of_and_terms
