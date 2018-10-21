@@ -64,7 +64,7 @@ Parse a .JED file and convert to logic equations.
 Arguments:
 
 - .JED source
-- List of pin names separated by spaces in order of pins (skipping power pins 12,24)
+- List of pin names, assuming active high, separated by spaces in order of pins (skipping power pins 12,24)
 
 Example:
 
@@ -81,12 +81,12 @@ IOGAL2
 
 ~~~
 python.exe .\gal22v10parse.py '..\CG3\IOGAL2\iogal2_readback.jed' "CA DBCAS L512 LA1 LA3 LA0 VRAMn
- IOSELn LA4 LA2 LP1SELn LADD1 CPUADD DBENn RAMENn S2 S1 S0 XDN XUP YDN YUP"
+ IOSELn LA4 LA2 LP1SELn LADD1 CPUADD DBEN RAMEN S2 S1 S0 XDN XUP YDN YUP"
 ~~~
 
 OUTPUT4
 
 ~~~
 python.exe .\gal22v10parse.py '..\CG3\OUTPUT\output4_readback.jed' "DOTCLK AT14 PD0 PD1 PD2
- PD3 PD4 PD5 PD6 PD7 WSTRBn UNK SEL0 SEL1 SBLU PBLU SGRN PGRN PRED SRED HS VS"
+ PD3 PD4 PD5 PD6 PD7 WSTRB UNK SEL0 SEL1 SBLU PBLU SGRN PGRN PRED SRED HS VS"
 ~~~

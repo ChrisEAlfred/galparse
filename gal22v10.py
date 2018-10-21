@@ -20,6 +20,10 @@ import macrocell
 class Gal22v10:
 
     IO_COUNT = 22
+    MACROCELL_COUNT = 10
+    MACROCELL_OR_TERMS = [
+        8, 10, 12, 14, 16, 16, 14 ,12, 10, 8
+    ]
     FUSEROW_MAPPING = [
         # Pin name index    Name prefix
         (0,                 ''),
@@ -72,6 +76,39 @@ class Gal22v10:
     # Private
     #----------------------------------------------------------------
 
+    def _build_macrocells(self, fuse_data):
+
+        self.macrocells = []
+        self.macrocells.append(macrocell.Macrocell('AR',1))
+
+        for macrocell_index in range(self.MACROCELL_COUNT):
+
+            # Assume simple name
+            pin_prefix = ''
+            pin_name = self.pin_names[21 - macrocell_index]
+            pin_suffix = ''
+
+            # Determine the macrocell output mode
+            fuse_index = 5808 + 2 * macrocell_index
+            if fuse_data[fuse_index+0] == '0' and fuse_data[fuse_index+1] == '0':
+                # Active low latched output
+                pin_prefix = '!'
+                pin_suffix = '.d'
+            elif fuse_data[fuse_index+0] == '1' and fuse_data[fuse_index+1] == '0':
+                # Active high latched output
+                pin_suffix = '.d'
+            elif fuse_data[fuse_index+0] == '0' and fuse_data[fuse_index+1] == '1':
+                # Active low output
+                pin_prefix = '!'
+            else:
+                # Active high output
+                pass
+            self.macrocells.append(macrocell.Macrocell(pin_prefix + pin_name+'.oe', 1))
+            self.macrocells.append(macrocell.Macrocell(pin_prefix + pin_name + pin_suffix, self.MACROCELL_OR_TERMS[macrocell_index]))
+
+        self.macrocells.append(macrocell.Macrocell('SP',1))
+
+
     #----------------------------------------------------------------
     # Public
     #----------------------------------------------------------------
@@ -86,32 +123,7 @@ class Gal22v10:
         # Assign fuse row
         self.fuserow = []
         for column in self.FUSEROW_MAPPING:
-            self.fuserow.append( column[1] + pin_names[ column[0] ] )
-
-        # Assign macrocells
-        self.macrocells = []
-        self.macrocells.append(macrocell.Macrocell('AR',1))
-        self.macrocells.append(macrocell.Macrocell(pin_names[21]+'_oe',1))
-        self.macrocells.append(macrocell.Macrocell(pin_names[21],8))
-        self.macrocells.append(macrocell.Macrocell(pin_names[20]+'_oe',1))
-        self.macrocells.append(macrocell.Macrocell(pin_names[20],10))
-        self.macrocells.append(macrocell.Macrocell(pin_names[19]+'_oe',1))
-        self.macrocells.append(macrocell.Macrocell(pin_names[19],12))
-        self.macrocells.append(macrocell.Macrocell(pin_names[18]+'_oe',1))
-        self.macrocells.append(macrocell.Macrocell(pin_names[18],14))
-        self.macrocells.append(macrocell.Macrocell(pin_names[17]+'_oe',1))
-        self.macrocells.append(macrocell.Macrocell(pin_names[17],16))
-        self.macrocells.append(macrocell.Macrocell(pin_names[16]+'_oe',1))
-        self.macrocells.append(macrocell.Macrocell(pin_names[16],16))
-        self.macrocells.append(macrocell.Macrocell(pin_names[15]+'_oe',1))
-        self.macrocells.append(macrocell.Macrocell(pin_names[15],14))
-        self.macrocells.append(macrocell.Macrocell(pin_names[14]+'_oe',1))
-        self.macrocells.append(macrocell.Macrocell(pin_names[14],12))
-        self.macrocells.append(macrocell.Macrocell(pin_names[13]+'_oe',1))
-        self.macrocells.append(macrocell.Macrocell(pin_names[13],10))
-        self.macrocells.append(macrocell.Macrocell(pin_names[12]+'_oe',1))
-        self.macrocells.append(macrocell.Macrocell(pin_names[12],8))
-        self.macrocells.append(macrocell.Macrocell('SP',1))
+            self.fuserow.append( column[1] + self.pin_names[ column[0] ] )
 
     def print_terms(self, fuse_data):
 
@@ -120,20 +132,18 @@ class Gal22v10:
         fuse_data: array of fuses as '0' or '1'
         """
 
-        fuse_index = 0
+        # Build the macrocells
+        self._build_macrocells(fuse_data)
 
         # Get the device fuse row
-        fuserow = self.fuserow
-        number_of_and_terms = len(fuserow)
+        number_of_and_terms = len(self.fuserow)
 
         # Loop over the macrocells
-        for macrocell in self.macrocells:
-
-            title = macrocell.name
-            number_of_or_terms = macrocell.number_of_or_terms
+        fuse_index = 0
+        for mc in self.macrocells:
 
             # Loop over the number of OR terms
-            for or_term in range(number_of_or_terms):
+            for or_term in range(mc.number_of_or_terms):
 
                 # Get the AND fuse data for this OR term
                 data = fuse_data[fuse_index:fuse_index+number_of_and_terms]
@@ -150,29 +160,29 @@ class Gal22v10:
                     # Two sequential terms X & !X with intact fuses will be 0
                     if index & 1 == 1:
                         if x == '0' and prev_term == '0':
-                            terms = 0
+                            s = '0'
                             break
 
                     # Include non-fused terms
                     if x == '0': # '0' is NOT fused
                         if index != 0 and terms != 0:
                             s = s + ' & '
-                        s = s + fuserow[index]
+                        s = s + self.fuserow[index]
                         terms = terms + 1
 
                     prev_term = x
                     index = index + 1
 
-                # If there are no terms the value is False ('0')
+                # If there are no terms the value is True ('1')
                 if terms == 0:
-                    s = '0'
+                    s = '1'
 
                 if or_term == 0:
                     # The first line must be printed
-                    s = title + ' = ' + s
+                    s = mc.name + ' = ' + s
                     print(s)
-                elif terms != 0:
-                    s = ' ' * len(title) + ' # ' + s
+                elif terms != 0 and s != '0':
+                    s = ' ' * len(mc.name) + ' # ' + s
                     print(s)
 
                 fuse_index = fuse_index + number_of_and_terms
