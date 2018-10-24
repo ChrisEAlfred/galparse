@@ -59,15 +59,21 @@ python.exe g540jedec.py test.JED test_g540.JED
 
 ### gal22v10parse
 
-Parse a .JED file and convert to logic equations.
+Parse a .JED file and generate CUPL source file
 
 Arguments:
 
 - .JED source
 - List of pin names, assuming active high, separated by spaces in order of pins (skipping power pins 12,24)
+- CUPL Name
+- CUPL revision
+- CUPL designer
+- CUPL company name
+- CUPL assembly
+- CUPL location
 
 Example:
 
 ~~~
-python.exe .\gal22v10parse.py test_g540.JED "p1 p2 p3 p4 p5 p6 p7 p8 p9 p10 p11 p13 p14 p15 p16 p17 p18 p19 p20 p21 p22 p23"
+python.exe .\gal22v10parse.py test_g540.JED "p1 p2 p3 p4 p5 p6 p7 p8 p9 p10 p11 p13 p14 p15 p16 p17 p18 p19 p20 p21 p22 p23" test 1 "Chris Alfred" "Company Name" myboard U6
 ~~~

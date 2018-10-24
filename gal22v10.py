@@ -103,7 +103,7 @@ class Gal22v10:
             else:
                 # Active high output
                 pass
-            self.macrocells.append(macrocell.Macrocell(pin_prefix + pin_name+'.oe', 1))
+            self.macrocells.append(macrocell.Macrocell(pin_prefix + pin_name+'.oe', 1, True))
             self.macrocells.append(macrocell.Macrocell(pin_prefix + pin_name + pin_suffix, self.MACROCELL_OR_TERMS[macrocell_index]))
 
         self.macrocells.append(macrocell.Macrocell('SP',1))
@@ -114,6 +114,8 @@ class Gal22v10:
     #----------------------------------------------------------------
 
     def __init__(self, pin_names):
+
+        self.device_name = 'p22v10'
 
         # Assign the pin names
         if len(pin_names) != self.IO_COUNT:
@@ -142,6 +144,8 @@ class Gal22v10:
         fuse_index = 0
         for mc in self.macrocells:
 
+            mc_equation = ''
+
             # Loop over the number of OR terms
             for or_term in range(mc.number_of_or_terms):
 
@@ -160,7 +164,7 @@ class Gal22v10:
                     # Two sequential terms X & !X with intact fuses will be 0
                     if index & 1 == 1:
                         if x == '0' and prev_term == '0':
-                            s = '0'
+                            s = "'b'0"
                             break
 
                     # Include non-fused terms
@@ -179,21 +183,29 @@ class Gal22v10:
                     prev_term = x
                     index = index + 1
 
-                # If there are no terms the value is True ('1')
                 if terms == 0:
-                    s = '1'
+                    # If there are no terms the value is True ('1')
+                    s = "'b'1"
 
                 # Determine output target name
                 output_name = mc.name
                 if output_name.startswith('!!'):
                     output_name = output_name[2:]
+                
+                # Remove output inversion for OE signals
+                if mc.oe and output_name.startswith('!'):
+                    output_name = output_name[1:]
 
                 if or_term == 0:
-                    # The first line must be printed
+                    # The first line requires the output name
                     s = output_name + ' = ' + s
-                    print(s)
-                elif terms != 0 and s != '0':
+                    mc_equation = mc_equation + s + '\n'
+                elif terms != 0 and s != "'b'0":
+                    # Subsequent terms are ORed
                     s = ' ' * len(output_name) + ' # ' + s
-                    print(s)
+                    mc_equation = mc_equation + s + '\n'
 
                 fuse_index = fuse_index + number_of_and_terms
+
+            mc_equation = mc_equation[:-1] + ';' + '\n'         
+            print(mc_equation)
