@@ -64,7 +64,7 @@ Parse a .JED file and generate CUPL source file
 Arguments:
 
 - .JED source
-- List of pin names, assuming active high, separated by spaces in order of pins (skipping power pins 12,24)
+- List of pin names separated by spaces in order of pins (skipping power pins 12,24). Prefix with `!` to indicate active low
 - CUPL Name
 - CUPL revision
 - CUPL designer
